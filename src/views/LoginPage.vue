@@ -28,22 +28,22 @@
               <div class="form-group mb-3">
                 <label for="password">Password</label>
                 <div class="input-group">
-                  <input
-                    :type="showPassword ? 'text' : 'password'"
-                    class="form-control"
-                    id="password"
-                    v-model.trim="password"
-                    @blur="validatePassword"
-                    :class="{ 'is-invalid': errors.password }"
-                    placeholder="Enter your password"
-                  />
-                  <button
-                    class="btn btn-outline-secondary"
-                    type="button"
-                    @click="togglePasswordVisibility"
-                  >
-                    <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                  </button>
+                    <input
+                  :type="showPassword ? 'text' : 'password'"
+                  class="form-control"
+                  id="password"
+                  v-model.trim="password"
+                  @blur="validatePassword"
+                  :class="{ 'is-invalid': errors.password }"
+                  placeholder="Enter your password"
+                />
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  @click="togglePasswordVisibility"
+                >
+                  <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                </button>
                   <div class="invalid-feedback" v-if="errors.password">
                     {{ errors.password }}
                   </div>
@@ -75,7 +75,7 @@ export default {
       password: '',
       errors: {},
       error: '',
-      showPassword: false,
+      showPassword: false, // Define showPassword here
     };
   },
   computed: {
@@ -109,8 +109,8 @@ export default {
         // Redirect to Dashboard upon successful login
         this.$router.push('/dashboard');
       } catch (e) {
-        // Display authentication error
-        this.error = "Invalid login details.";
+        // Display fixed authentication error
+        this.error = "Invalid login details";
       }
     },
 
@@ -136,7 +136,7 @@ export default {
       }
     },
 
-    // Toggle Password Visibility
+    // Toggle Password Visibility Method
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },

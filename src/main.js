@@ -4,6 +4,7 @@ import router from './router/router';
 import store from './store/store';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 createApp(App)
   .use(store)
