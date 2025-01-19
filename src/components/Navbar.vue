@@ -1,83 +1,82 @@
 <template>
-    <nav class="navbar navbar-expand-lg" :class="isDarkMode ? 'navbar-dark bg-dark' : 'navbar-light bg-light'">
-      <div class="container-fluid">
-        <!-- Brand -->
-        <router-link class="navbar-brand" to="/">TagAlong</router-link>
-  
-        <!-- Toggler for mobile view -->
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-  
-        <!-- Navbar Links -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <!-- Home Link -->
+  <nav class="navbar navbar-expand-lg" :class="isDarkMode ? 'navbar-dark bg-dark' : 'navbar-light bg-light'">
+    <div class="container-fluid">
+      <!-- Logo and Brand -->
+      <router-link class="navbar-brand d-flex align-items-center" to="/">
+        <img :src="isDarkMode ? '/logo_yellow.png' : '/logo_blue.png'"
+        alt="Logo" class="navbar-logo"/>
+      </router-link>
+
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <router-link to="/" class="nav-link" exact-active-class="active">
+              Home
+            </router-link>
+          </li>
+
+          <!-- Always show Guide link for debugging -->
+          <li class="nav-item">
+            <router-link to="/guide" class="nav-link" exact-active-class="active">
+              Guide
+            </router-link>
+          </li>
+
+          <template v-if="!isAuthenticated">
             <li class="nav-item">
-              <router-link to="/" class="nav-link" exact-active-class="active">
-                Home
+              <router-link to="/login" class="nav-link" exact-active-class="active">
+                Login
               </router-link>
             </li>
+            <li class="nav-item">
+              <router-link to="/signup" class="nav-link" exact-active-class="active">
+                Signup
+              </router-link>
+            </li>
+          </template>
 
-            <!-- Links for Unauthenticated Users -->
-            <template v-if="!isAuthenticated">
-              <li class="nav-item">
-                <router-link to="/guide" class="nav-link" exact-active-class="active">
-                  Guide
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/login" class="nav-link" exact-active-class="active">
-                  Login
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/signup" class="nav-link" exact-active-class="active">
-                  Signup
-                </router-link>
-              </li>
-            </template>
-  
-            <!-- Links for Authenticated Users -->
-            <template v-else>
-              <li class="nav-item">
-                <router-link to="/dashboard" class="nav-link" exact-active-class="active">
-                  Dashboard
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link" @click.prevent="onLogout">
-                  Logout
-                </a>
-              </li>
-            </template>
-          </ul>
-  
-          <!-- Dark Mode Toggle -->
-          <div class="form-check form-switch ms-3">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="darkModeToggle"
-              :checked="isDarkMode"
-              @change="toggleDarkMode"
-            />
-            <label class="form-check-label" for="darkModeToggle">
-              {{ !isDarkMode ? 'Light Mode' : 'Dark Mode' }}
-            </label>
-          </div>
+          <template v-else>
+            <li class="nav-item">
+              <router-link to="/dashboard" class="nav-link" exact-active-class="active">
+                Dashboard
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link" @click.prevent="onLogout">
+                Logout
+              </a>
+            </li>
+          </template>
+        </ul>
+        <div class="form-check form-switch ms-3">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="darkModeToggle"
+            :checked="isDarkMode"
+            @change="toggleDarkMode"
+          />
+          <label class="form-check-label" for="darkModeToggle">
+            {{ !isDarkMode ? 'Light Mode' : 'Dark Mode' }}
+          </label>
         </div>
       </div>
-    </nav>
-  </template>
+    </div>
+  </nav>
+</template>
+
   
   <script>
   import { mapActions, mapState, mapGetters } from 'vuex';
@@ -91,8 +90,8 @@
         isAuthenticated: 'IS_USER_AUTHENTICATE_GETTER',
       }),
       isDarkMode() {
-        return this.darkMode; // Synced with Vuex
-      },
+      return this.$store.state.darkMode; // Assuming dark mode is stored in Vuex
+    },
     },
     methods: {
       ...mapActions(['toggleDarkMode']), // Vuex action to toggle dark mode

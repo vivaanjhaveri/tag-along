@@ -1,129 +1,102 @@
 <template>
     <div class="container mt-5">
       <!-- Page Title -->
-      <h1 class="text-center mb-4" style="color: #0d6efd;">How to Use Our Product</h1>
+      <h1 class="main-title">
+        How to Use Our Product 🚀
+      </h1>
   
-      <!-- Guide Steps -->
-      <div>
-        <!-- Step 1 -->
-        <div class="card shadow mb-3">
-          <div class="card-body">
-            <h5>1. Attach the RFID tag to your item</h5>
-            <p>Securely attach the tag to whatever you want to track.</p>
-            <hr>
-          </div>
-  
-          <!-- Step 2 -->
-          <div class="card-body">
-            <h5>2. Sign up (or Log in) to your account</h5>
-            <p>
-              If you're new, create an account to get started. Already have an account? Log in to access your
-              dashboard.
-            </p>
-            <div class="d-flex gap-3">
-              <router-link to="/signup" class="btn btn-primary">
-                Sign Up
-              </router-link>
-              <router-link to="/login" class="btn btn-secondary">
-                Log In
-              </router-link>
+      <!-- Single Card for All Steps -->
+      <div class="card shadow mb-3">
+            <div class="card-body">
+                <!-- Step 1 -->
+                <h5>1️⃣ Attach the tag to your item</h5>
+                <p>🔒 Securely attach the RFID tag to the item you wish to track.</p>
+                <hr />
+
+                <!-- Step 2 -->
+                <h5>2️⃣ Sign up (or Log in) to your account</h5>
+                <p>📝 If you're new, create an account to get started. Already have an account? Log in to access your dashboard.</p>
+                <div class="d-flex gap-3 mb-3">
+                    <router-link to="/signup" class="btn btn-primary">
+                        Sign Up
+                    </router-link>
+                    <router-link to="/login" class="btn btn-secondary">
+                        Log In
+                    </router-link>
+                </div>
+                <hr />
+
+                <!-- Step 3 -->
+                <h5>3️⃣ On your dashboard, click on "Add new tag"</h5>
+                <p>🖱️ Once logged in, navigate to your dashboard and click the "Add new tag" button to begin.</p>
+                <hr />
+
+                <!-- Step 4 -->
+                <h5>4️⃣ Scan the RFID tag</h5>
+                <p>📡 Use your device to scan the RFID tag. Ensure that the tag is within scanning range for accurate detection.</p>
+                <hr />
+
+                <!-- Step 5 -->
+                <h5>5️⃣ Complete the tag details</h5>
+                <p>📋 Fill in the required details:</p>
+                <ul>
+                    <li><strong>🔑 Tag ID:</strong> The unique ID of your tag.</li>
+                    <li><strong>📌 Object:</strong> The name of the object the tag is attached to.</li>
+                    <li><strong>🖊️ Description:</strong> A brief description of the object.</li>
+                </ul>
+                <hr />
+
+                <!-- Step 6 -->
+                <h5>6️⃣ You’re all set!</h5>
+                <p>🎉 You can now track your items. At any time, you can delete or rename a tag as needed.</p>
             </div>
-            <hr>
-          </div>
-  
-          <!-- Step 3 -->
-          <div class="card-body">
-            <h5>3. On your dashboard, click on "Start Scan"</h5>
-            <p>
-              Once logged in, head to your dashboard. Make sure your device has NFC enabled. Click the <strong>Start
-              Scan</strong> button and bring the item (with its RFID tag) near your device.
-            </p>
-            <hr>
-          </div>
-  
-          <!-- Step 4 -->
-          <div class="card-body">
-            <h5>4. Check the status of your tag</h5>
-            <p>
-              If it's a <strong>new tag</strong>, you'll see an alert confirming it has been
-              <em>"added successfully"</em> and the status will appear as <strong>"Registered"</strong> (green badge).
-              If it’s an <strong>existing tag</strong>, the status changes to <strong>"Scanned"</strong> (yellow
-              badge).
-            </p>
-            <p>
-              You can view all tags in the table on your dashboard. Each tag shows its ID, object name, status,
-              and last updated time.
-            </p>
-            <hr>
-          </div>
-  
-          <!-- Step 5 -->
-          <div class="card-body">
-            <h5>5. Watch out for the 1-minute timer</h5>
-            <p>
-              When a new tag is first scanned, a background timer starts. If the tag is somehow not
-              successfully in the system after 1 minute, you'll see an alert saying 
-              <em>"You left your {tag_id} behind"</em>. This helps ensure you don't forget to finalize
-              registration of your new tag.
-            </p>
-            <hr>
-          </div>
-  
-          <!-- Step 6 -->
-          <div class="card-body">
-            <h5>6. Manage your tags as needed</h5>
-            <p>
-              On the dashboard, you can:
-            </p>
-            <ul>
-              <li><strong>Rename</strong> a tag (to update the <em>Object</em> field).</li>
-              <li><strong>Delete</strong> a tag if it's no longer in use.</li>
-            </ul>
-            <p>That’s it! Your items are now easily tracked and managed through your dashboard.</p>
-          </div>
         </div>
-      </div>
     </div>
-  </template>
+</template>
   
   <script>
   export default {
-    name: "GuidePage",
-  };
-  </script>
-  
-  <style scoped>
-  .container {
-    max-width: 800px;
-  }
-  
-  h5 {
-    color: #0d6efd; /* Bootstrap primary color */
-  }
-  
-  .card {
-    padding-top: 50px;
-    padding-left: 40px;
-    padding-right: 40px;
-    padding-bottom: 50px;
-  }
-  
-  .card-body {
-    margin-top: 0;
-    padding-top: 0;
-    margin-bottom: 0;
-    padding-bottom: 0;
-  }
-  
-  /* Style buttons */
-  .btn-primary {
-    background-color: #007bff;
-    border: none;
-  }
-  
-  .btn-secondary {
-    background-color: #6c757d;
-    border: none;
-  }
-  </style>
-  
+    name: "GuidePage",computed: {
+    isDarkMode() {
+      return this.$store.state.darkMode; // Assuming dark mode is stored in Vuex
+    },
+  },
+};
+</script>
+
+<style scoped>
+/* Styling for the card and container */
+.card {
+  border-radius: 15px;
+  transition: transform 0.2s ease-in-out;
+  padding: 25px;
+}
+
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+
+/* Step Title Styling */
+.step-title {
+  color: #0d6efd; /* Default light mode color */
+}
+
+body.dark-mode .step-title {
+  color: white; /* Dark mode color */
+}
+
+/* Button styling */
+.btn-primary {
+  margin-right: 15px;
+}
+
+hr {
+  border-top: 1px solid #ddd;
+}
+</style>

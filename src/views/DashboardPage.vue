@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-5">
-    <h2 class="text-center">Dashboard</h2>
+    <h2 class="main-title">Dashboard</h2>
 
     <!-- NFC Scan Section -->
     <div class="mt-4" style="text-align: center;">
