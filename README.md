@@ -118,6 +118,6 @@ TagAlong is built with **Vue.js** and **Firebase**  designed to assist neurodive
 
 ## Devpost
 
-Check out our [Devpost](https://devpost.com/software/tagalong-t2lx75).
+Check out our [Devpost](https://devpost.com/software/tagalong-t2lx75) for more information and pictures!
 
 Thank you for using **TagAlong** – happy tagging!
