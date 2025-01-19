@@ -20,21 +20,14 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    if (
-        'auth' in to.meta &&
-        to.meta.auth &&
-        !store.getters[`auth/${IS_USER_AUTHENTICATE_GETTER}`]
-    ) {
-        next('/login');
-    } else if (
-        'auth' in to.meta &&
-        !to.meta.auth &&
-        store.getters[`auth/${IS_USER_AUTHENTICATE_GETTER}`]
-    ) {
-        next('/dashboard');
-    } else {
-        next();
-    }
+  const isAuthenticated = store.getters[`auth/${IS_USER_AUTHENTICATE_GETTER}`];
+  if (to.meta.auth && !isAuthenticated) {
+    next('/login');
+  } else if (!to.meta.auth && isAuthenticated && (to.path === '/login' || to.path === '/signup')) {
+    next('/dashboard');
+  } else {
+    next();
+  }
 });
 
 export default router;

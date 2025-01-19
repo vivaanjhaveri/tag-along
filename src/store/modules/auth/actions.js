@@ -12,7 +12,7 @@ import {
     SET_AUTO_LOGOUT_MUTATION,
 } from '@/store/storeconstants';
 
-let timer = '';
+let timer = null;
 export default {
     [LOGOUT_ACTION](context) {
         context.commit(SET_USER_TOKEN_DATA_MUTATION, {
@@ -92,10 +92,11 @@ export default {
             let tokenData = {
                 email: response.data.email,
                 token: response.data.idToken,
-                expiresIn: expirationTime,
+                expiresIn: new Date().getTime() + expirationTime,
                 refreshToken: response.data.refreshToken,
                 userId: response.data.localId,
             };
+            
             localStorage.setItem('userData', JSON.stringify(tokenData));
             context.commit(SET_USER_TOKEN_DATA_MUTATION, tokenData);
         }
