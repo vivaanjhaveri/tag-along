@@ -3,12 +3,14 @@ import HomeView from '@/views/HomePage.vue';
 import LoginPage from '@/views/LoginPage.vue';
 import SignupPage from '@/views/SignupPage.vue';
 import DashboardPage from '@/views/DashboardPage.vue';
+import GuidePage from '@/views/GuidePage.vue';
 import store from '@/store/store';
 import { IS_USER_AUTHENTICATE_GETTER } from '@/store/storeconstants';
 
 
 const routes = [
     { path: '/', component: HomeView },
+    { path: '/guide', component: GuidePage, meta: { auth: false } },
     { path: '/login', component: LoginPage, meta: { auth: false } },
     { path: '/signup', component: SignupPage, meta: { auth: false } },
     { path: '/dashboard', component: DashboardPage, meta: { auth: true } },

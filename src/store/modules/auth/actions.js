@@ -181,4 +181,14 @@ import {
         context.dispatch(AUTO_LOGOUT_ACTION);
       }, remainingTime);
     },
+
+    toggleDarkMode({ commit, state }) {
+        const newMode = !state.darkMode;
+        localStorage.setItem('darkMode', newMode);
+        commit('TOGGLE_DARK_MODE');
+      },
+      setDarkMode({ commit }, payload) {
+        localStorage.setItem('darkMode', payload);
+        commit('SET_DARK_MODE', payload);
+      },
   };  
