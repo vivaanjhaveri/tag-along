@@ -7,8 +7,6 @@
           <h3>Signup</h3>
           <hr />
 
-          <!-- Email/Password Sign-Up Section -->
-          <h5>Email/Password Sign-Up</h5>
           <!-- Error Alert -->
           <div class="alert alert-danger" v-if="emailPasswordError">
             {{ emailPasswordError }}

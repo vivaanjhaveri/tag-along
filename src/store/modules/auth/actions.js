@@ -4,13 +4,15 @@ import {
     SET_USER_TOKEN_DATA_MUTATION,
     CLEAR_AUTH_MUTATION,
     SET_AUTO_LOGOUT_MUTATION,
+    //SET_LOADING,
+    //CLEAR_LOADING,
     AUTO_LOGIN_ACTION,
-    LOGOUT_ACTION,
     AUTO_LOGOUT_ACTION,
     SEND_SIGNIN_LINK,
     VERIFY_SIGNIN_LINK,
     SIGNUP_ACTION,
     LOGIN_ACTION,
+    LOGOUT_ACTION,
   } from '@/store/storeconstants';
   
   import {
@@ -21,7 +23,7 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
   } from '@/services/firebase';
-    
+  
   let timer = null;
   
   export default {
@@ -85,7 +87,7 @@ import {
     async [SEND_SIGNIN_LINK](context, payload) {
       context.commit('SET_LOADING');
       const actionCodeSettings = {
-        url: 'http://localhost:8081/login', // Replace with your app's URL
+        url: 'http://localhost:8080/login', // Replace with your app's URL
         handleCodeInApp: true,
       };
       try {
@@ -135,12 +137,20 @@ import {
     },
   
     // Logout Action
-    [LOGOUT_ACTION](context) {
-      auth.signOut();
-      context.commit(CLEAR_AUTH_MUTATION);
-      localStorage.removeItem('userData');
-      if (timer) {
-        clearTimeout(timer);
+    async [LOGOUT_ACTION](context) {
+      context.commit('SET_LOADING');
+      try {
+        await auth.signOut();
+        context.commit(CLEAR_AUTH_MUTATION);
+        localStorage.removeItem('userData');
+        if (timer) {
+          clearTimeout(timer);
+        }
+      } catch (error) {
+        console.error("Error during logout:", error);
+        throw error.message || "Logout failed.";
+      } finally {
+        context.commit('CLEAR_LOADING');
       }
     },
   

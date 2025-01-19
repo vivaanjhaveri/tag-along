@@ -6,14 +6,11 @@
         <div class="card-body">
           <h3>Login</h3>
           <hr />
-          
-          <!-- General Error Alert -->
+          <!-- Error Alert -->
           <div class="alert alert-danger" v-if="error">
             {{ error }}
           </div>
-          
-          <!-- Email/Password Sign-In Form -->
-          <form @submit.prevent="onEmailPasswordLogin">
+          <form @submit.prevent="onLogin">
             <div class="form-group mb-3">
               <label for="email">Email</label>
               <input
@@ -55,40 +52,12 @@
             </div>
 
             <div class="my-3">
-              <button type="submit" class="btn btn-primary w-100">
-                <span>Login</span>
+              <button type="submit" class="btn btn-primary w-100" :disabled="loading">
+                <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span v-else>Login</span>
               </button>
             </div>
           </form>
-
-          <hr />
-
-          <!-- Passwordless Sign-In Form -->
-           <h5>Passwordless Email Link Log-In </h5>
-          <form @submit.prevent="onPasswordlessLogin">
-            <div class="form-group mb-3">
-              <label for="passwordlessEmail">Email</label>
-              <input
-                type="email"
-                class="form-control"
-                id="passwordlessEmail"
-                v-model.trim="passwordlessEmail"
-                @blur="validatePasswordlessEmail"
-                :class="{ 'is-invalid': errors.passwordlessEmail }"
-                placeholder="Enter your email"
-              />
-              <div class="invalid-feedback" v-if="errors.passwordlessEmail">
-                {{ errors.passwordlessEmail }}
-              </div>
-            </div>
-
-            <div class="my-3">
-              <button type="submit" class="btn w-100" style="background-color: green; color: white;">
-                <span>Send Sign-In Link</span>
-              </button>
-            </div>
-          </form>
-
         </div>
       </div>
     </div>
@@ -96,9 +65,9 @@
 </template>
 
 <script>
-import { auth, isSignInWithEmailLink } from '@/services/firebase';
 import { mapActions, mapGetters } from 'vuex';
-import { VERIFY_SIGNIN_LINK, LOGIN_ACTION, SEND_SIGNIN_LINK } from '@/store/storeconstants';
+import SignupValidations from '@/services/SignupValidations';
+import { LOGIN_ACTION } from '@/store/storeconstants';
 
 export default {
   name: 'LoginPage',
@@ -106,7 +75,6 @@ export default {
     return {
       email: '',
       password: '',
-      passwordlessEmail: '',
       errors: {},
       error: '',
       showPassword: false,
@@ -114,41 +82,31 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'autoLogout']),
-  },
-  created() {
-    // Handle sign-in link if present in URL
-    if (isSignInWithEmailLink(auth, window.location.href)) {
-      const email = window.localStorage.getItem('emailForSignIn') || this.passwordlessEmail;
-      if (!email) {
-        // Prompt user to enter their email
-        this.error = "Please enter your email for sign-in.";
-      } else {
-        this.passwordlessEmail = email;
-        this.onPasswordlessLoginLink();
-      }
-    }
+    loading() {
+      return this.$store.state.showLoading;
+    },
   },
   methods: {
     ...mapActions('auth', {
       login: LOGIN_ACTION,
-      sendSignInLink: SEND_SIGNIN_LINK,
-      verifySignInLink: VERIFY_SIGNIN_LINK,
     }),
 
-    // Email/Password Login
-    async onEmailPasswordLogin() {
+    async onLogin() {
       // Reset previous errors
       this.errors = {};
       this.error = '';
 
       // Validate form inputs
-      this.validateEmail();
-      this.validatePassword();
+      const validations = new SignupValidations(this.email, this.password);
+      this.errors = validations.checkValidations();
 
       // Check for validation errors
       if (Object.keys(this.errors).length) {
         return;
       }
+
+      // Show loading spinner
+      this.$store.commit('SET_LOADING');
 
       // Attempt to login
       try {
@@ -161,43 +119,13 @@ export default {
       } catch (e) {
         // Display fixed authentication error
         this.error = "Invalid login details";
+      } finally {
+        // Hide loading spinner
+        this.$store.commit('CLEAR_LOADING');
       }
     },
 
-    // Passwordless Sign-In: Send Sign-In Link
-    async onPasswordlessLogin() {
-      // Reset previous errors and messages
-      this.errors = {};
-      this.error = '';
-
-      // Validate email
-      this.validatePasswordlessEmail();
-
-      // Check for validation errors
-      if (Object.keys(this.errors).length) {
-        return;
-      }
-
-      // Send sign-in link
-      try {
-        await this.sendSignInLink({ email: this.passwordlessEmail });
-        this.error = "Sign-in link sent! Please check your email.";
-      } catch (e) {
-        this.error = e;
-      }
-    },
-
-    // Handle Sign-In Link Click
-    async onPasswordlessLoginLink() {
-      try {
-        await this.verifySignInLink({ email: this.passwordlessEmail });
-        this.$router.push('/dashboard');
-      } catch (e) {
-        this.error = e;
-      }
-    },
-
-    // Real-time Email Validation for Email/Password Login
+    // Real-time Email Validation
     validateEmail() {
       if (!this.email) {
         this.errors.email = 'Email is required.';
@@ -208,7 +136,7 @@ export default {
       }
     },
 
-    // Real-time Password Validation for Email/Password Login
+    // Real-time Password Validation
     validatePassword() {
       if (!this.password) {
         this.errors.password = 'Password is required.';
@@ -219,15 +147,9 @@ export default {
       }
     },
 
-    // Real-time Email Validation for Passwordless Sign-In
-    validatePasswordlessEmail() {
-      if (!this.passwordlessEmail) {
-        this.errors.passwordlessEmail = 'Email is required.';
-      } else if (!this.validEmail(this.passwordlessEmail)) {
-        this.errors.passwordlessEmail = 'Please enter a valid email address.';
-      } else {
-        this.errors.passwordlessEmail = '';
-      }
+    // Toggle Password Visibility
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
     },
 
     // Email Format Checker
@@ -236,10 +158,12 @@ export default {
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()[\]\\.,;:\s@"]+\.)+[^<>()[\]\\.,;:\s@"]{2,})$/i;
       return re.test(email);
     },
-
-    // Toggle Password Visibility
-    togglePasswordVisibility() {
-      this.showPassword = !this.showPassword;
+  },
+  watch: {
+    autoLogout(newVal) {
+      if (newVal) {
+        this.$router.replace('/login');
+      }
     },
   },
 };
@@ -250,12 +174,12 @@ export default {
   display: block;
 }
 
-.alert {
-  margin-top: 10px;
+button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .card {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
 </style>
