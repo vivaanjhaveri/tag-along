@@ -1,9 +1,12 @@
-export default {
-    GET_USER_TOKEN_GETTER: (state) => {
-      return state.token;
-    },
+import {
+    GET_USER_TOKEN_GETTER,
+    IS_USER_AUTHENTICATE_GETTER,
+  } from '@/store/storeconstants';
   
-    IS_USER_AUTHENTICATE_GETTER(state) {
+  export default {
+    [GET_USER_TOKEN_GETTER]: (state) => state.token,
+  
+    [IS_USER_AUTHENTICATE_GETTER](state) {
       return !!state.token;
     },
   };

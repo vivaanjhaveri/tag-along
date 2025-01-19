@@ -7,15 +7,73 @@ import {
   AUTO_LOGIN_ACTION,
   LOGOUT_ACTION,
   SET_USER_TOKEN_DATA_MUTATION,
+  /**CLEAR_AUTH_MUTATION,
+  SET_LOADING,
+  CLEAR_LOADING,*/
   SIGNUP_ACTION,
   AUTO_LOGOUT_ACTION,
   SET_AUTO_LOGOUT_MUTATION,
 } from '@/store/storeconstants';
+import { auth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from '@/services/firebase';
 
 let timer = null;
-
-export default {
-  [LOGOUT_ACTION](context) {
+  export default {
+    async sendSignInLink(context, payload) {
+      context.commit('SET_LOADING');
+      const actionCodeSettings = {
+        // URL you want to redirect back to. 
+        url: 'tag-along.web.app', 
+        handleCodeInApp: true,
+      };
+  
+      try {
+        await sendSignInLinkToEmail(auth, payload.email, actionCodeSettings);
+        // Save the email locally so you don't need to ask the user again
+        window.localStorage.setItem('emailForSignIn', payload.email);
+        // Optionally, show a message to the user to check their email
+      } catch (error) {
+        // Handle Errors here.
+        console.error("Error sending sign-in link:", error);
+        throw "Failed to send sign-in link. Please try again.";
+      } finally {
+        context.commit('CLEAR_LOADING');
+      }
+    },
+  
+    async verifySignInLink(context, payload) {
+      context.commit('SET_LOADING');
+      try {
+        const email = window.localStorage.getItem('emailForSignIn') || payload.email;
+        if (!isSignInWithEmailLink(auth, window.location.href)) {
+          throw "Invalid sign-in link.";
+        }
+  
+        // The client SDK will parse the code from the link for you.
+        const result = await signInWithEmailLink(auth, email, window.location.href);
+        // Clear the email from storage.
+        window.localStorage.removeItem('emailForSignIn');
+  
+        // Extract user information
+        const user = result.user;
+        const tokenData = {
+          email: user.email,
+          token: await user.getIdToken(),
+          expiresIn: new Date().getTime() + 3600 * 1000, // 1 hour
+          refreshToken: user.refreshToken,
+          userId: user.uid,
+        };
+  
+        localStorage.setItem('userData', JSON.stringify(tokenData));
+        context.commit(SET_USER_TOKEN_DATA_MUTATION, tokenData);
+      } catch (error) {
+        console.error("Error verifying sign-in link:", error);
+        throw "Failed to sign in. Please try again.";
+      } finally {
+        context.commit('CLEAR_LOADING');
+      }
+    },
+    
+    [LOGOUT_ACTION](context) {
     context.commit('CLEAR_AUTH');
     localStorage.removeItem('userData');
     if (timer) {

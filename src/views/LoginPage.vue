@@ -1,34 +1,38 @@
+<!-- src/views/LoginPage.vue -->
 <template>
-    <div class="row">
-      <div class="col-md-6 offset-md-3">
-        <div class="card mt-5">
-          <div class="card-body">
-            <h3>Login</h3>
-            <hr />
-            <!-- Error Alert -->
-            <div class="alert alert-danger" v-if="error">
-              {{ error }}
-            </div>
-            <form @submit.prevent="onLogin">
-              <div class="form-group mb-3">
-                <label for="email">Email</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  id="email"
-                  v-model.trim="email"
-                  @blur="validateEmail"
-                  :class="{ 'is-invalid': errors.email }"
-                  placeholder="Enter your email"
-                />
-                <div class="invalid-feedback" v-if="errors.email">
-                  {{ errors.email }}
-                </div>
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <div class="card mt-5">
+        <div class="card-body">
+          <h3>Login</h3>
+          <hr />
+          
+          <!-- Error Alert -->
+          <div class="alert alert-danger" v-if="error">
+            {{ error }}
+          </div>
+          
+          <!-- Email/Password Sign-In Form -->
+          <form @submit.prevent="onEmailPasswordLogin">
+            <div class="form-group mb-3">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                v-model.trim="email"
+                @blur="validateEmail"
+                :class="{ 'is-invalid': errors.email }"
+                placeholder="Enter your email"
+              />
+              <div class="invalid-feedback" v-if="errors.email">
+                {{ errors.email }}
               </div>
-              <div class="form-group mb-3">
-                <label for="password">Password</label>
-                <div class="input-group">
-                    <input
+            </div>
+            <div class="form-group mb-3">
+              <label for="password">Password</label>
+              <div class="input-group">
+                <input
                   :type="showPassword ? 'text' : 'password'"
                   class="form-control"
                   id="password"
@@ -44,28 +48,63 @@
                 >
                   <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                 </button>
-                  <div class="invalid-feedback" v-if="errors.password">
-                    {{ errors.password }}
-                  </div>
+                <div class="invalid-feedback" v-if="errors.password">
+                  {{ errors.password }}
                 </div>
               </div>
-  
-              <div class="my-3">
-                <button type="submit" class="btn btn-primary w-100">
-                  <span>Login</span>
-                </button>
+            </div>
+
+            <div class="my-3">
+              <button type="submit" class="btn btn-primary w-100">
+                <span>Login</span>
+              </button>
+            </div>
+          </form>
+
+          <hr />
+
+          <!-- Divider -->
+          <div class="text-center my-3">OR</div>
+
+          <!-- Passwordless Sign-In Form -->
+          <form @submit.prevent="onPasswordlessLogin">
+            <div class="form-group mb-3">
+              <label for="passwordlessEmail">Email for Passwordless Sign-In</label>
+              <input
+                type="email"
+                class="form-control"
+                id="passwordlessEmail"
+                v-model.trim="passwordlessEmail"
+                @blur="validatePasswordlessEmail"
+                :class="{ 'is-invalid': errors.passwordlessEmail }"
+                placeholder="Enter your email"
+              />
+              <div class="invalid-feedback" v-if="errors.passwordlessEmail">
+                {{ errors.passwordlessEmail }}
               </div>
-            </form>
-          </div>
+            </div>
+
+            <div class="my-3">
+              <button type="submit" class="btn btn-secondary w-100">
+                <span>Send Sign-In Link</span>
+              </button>
+            </div>
+          </form>
+
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
 
 <script>
+import { auth, isSignInWithEmailLink } from '@/services/firebase';
 import { mapActions, mapGetters } from 'vuex';
-import SignupValidations from '@/services/SignupValidations';
-import { LOGIN_ACTION } from '@/store/storeconstants';
+import { VERIFY_SIGNIN_LINK } from '@/store/storeconstants';
+import {
+  LOGIN_ACTION,
+  SEND_SIGNIN_LINK,
+} from '@/store/storeconstants';
 
 export default {
   name: 'LoginPage',
@@ -73,27 +112,43 @@ export default {
     return {
       email: '',
       password: '',
+      passwordlessEmail: '',
       errors: {},
       error: '',
-      showPassword: false, // Define showPassword here
+      showPassword: false,
     };
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'autoLogout']),
   },
+  created() {
+    // Handle sign-in link if present in URL
+    if (isSignInWithEmailLink(auth, window.location.href)) {
+      const email = window.localStorage.getItem('emailForSignIn') || this.passwordlessEmail;
+      if (!email) {
+        // Prompt user to enter their email
+        this.error = "Please enter your email for sign-in.";
+      } else {
+        this.passwordlessEmail = email;
+        this.onPasswordlessLoginLink();
+      }
+    }
+  },
   methods: {
     ...mapActions('auth', {
       login: LOGIN_ACTION,
+      sendSignInLink: SEND_SIGNIN_LINK,
     }),
 
-    async onLogin() {
+    // Email/Password Login
+    async onEmailPasswordLogin() {
       // Reset previous errors
       this.errors = {};
       this.error = '';
 
       // Validate form inputs
-      const validations = new SignupValidations(this.email, this.password);
-      this.errors = validations.checkValidations();
+      this.validateEmail();
+      this.validatePassword();
 
       // Check for validation errors
       if (Object.keys(this.errors).length) {
@@ -114,7 +169,40 @@ export default {
       }
     },
 
-    // Real-time Email Validation
+    // Passwordless Sign-In: Send Sign-In Link
+    async onPasswordlessLogin() {
+      // Reset previous errors and messages
+      this.errors = {};
+      this.error = '';
+
+      // Validate email
+      this.validatePasswordlessEmail();
+
+      // Check for validation errors
+      if (Object.keys(this.errors).length) {
+        return;
+      }
+
+      // Send sign-in link
+      try {
+        await this.sendSignInLink({ email: this.passwordlessEmail });
+        this.error = "Sign-in link sent! Please check your email.";
+      } catch (e) {
+        this.error = e;
+      }
+    },
+
+    // Handle Sign-In Link Click
+    async onPasswordlessLoginLink() {
+      try {
+        await this.$store.dispatch('auth/' + VERIFY_SIGNIN_LINK, { email: this.passwordlessEmail });
+        this.$router.push('/dashboard');
+      } catch (e) {
+        this.error = e;
+      }
+    },
+
+    // Real-time Email Validation for Email/Password Login
     validateEmail() {
       if (!this.email) {
         this.errors.email = 'Email is required.';
@@ -125,7 +213,7 @@ export default {
       }
     },
 
-    // Real-time Password Validation
+    // Real-time Password Validation for Email/Password Login
     validatePassword() {
       if (!this.password) {
         this.errors.password = 'Password is required.';
@@ -136,9 +224,15 @@ export default {
       }
     },
 
-    // Toggle Password Visibility Method
-    togglePasswordVisibility() {
-      this.showPassword = !this.showPassword;
+    // Real-time Email Validation for Passwordless Sign-In
+    validatePasswordlessEmail() {
+      if (!this.passwordlessEmail) {
+        this.errors.passwordlessEmail = 'Email is required.';
+      } else if (!this.validEmail(this.passwordlessEmail)) {
+        this.errors.passwordlessEmail = 'Please enter a valid email address.';
+      } else {
+        this.errors.passwordlessEmail = '';
+      }
     },
 
     // Email Format Checker
@@ -147,12 +241,10 @@ export default {
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()[\]\\.,;:\s@"]+\.)+[^<>()[\]\\.,;:\s@"]{2,})$/i;
       return re.test(email);
     },
-  },
-  watch: {
-    autoLogout(newVal) {
-      if (newVal) {
-        this.$router.replace('/login');
-      }
+
+    // Toggle Password Visibility
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
     },
   },
 };
@@ -163,12 +255,12 @@ export default {
   display: block;
 }
 
-button[disabled] {
-  cursor: not-allowed;
-  opacity: 0.65;
+.alert {
+  margin-top: 10px;
 }
 
 .card {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
 </style>
