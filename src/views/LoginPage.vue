@@ -7,7 +7,7 @@
           <h3>Login</h3>
           <hr />
           
-          <!-- Error Alert -->
+          <!-- General Error Alert -->
           <div class="alert alert-danger" v-if="error">
             {{ error }}
           </div>
@@ -63,13 +63,11 @@
 
           <hr />
 
-          <!-- Divider -->
-          <div class="text-center my-3">OR</div>
-
           <!-- Passwordless Sign-In Form -->
+           <h5>Passwordless Email Link Log-In </h5>
           <form @submit.prevent="onPasswordlessLogin">
             <div class="form-group mb-3">
-              <label for="passwordlessEmail">Email for Passwordless Sign-In</label>
+              <label for="passwordlessEmail">Email</label>
               <input
                 type="email"
                 class="form-control"
@@ -85,7 +83,7 @@
             </div>
 
             <div class="my-3">
-              <button type="submit" class="btn btn-secondary w-100">
+              <button type="submit" class="btn w-100" style="background-color: green; color: white;">
                 <span>Send Sign-In Link</span>
               </button>
             </div>
@@ -100,11 +98,7 @@
 <script>
 import { auth, isSignInWithEmailLink } from '@/services/firebase';
 import { mapActions, mapGetters } from 'vuex';
-import { VERIFY_SIGNIN_LINK } from '@/store/storeconstants';
-import {
-  LOGIN_ACTION,
-  SEND_SIGNIN_LINK,
-} from '@/store/storeconstants';
+import { VERIFY_SIGNIN_LINK, LOGIN_ACTION, SEND_SIGNIN_LINK } from '@/store/storeconstants';
 
 export default {
   name: 'LoginPage',
@@ -138,6 +132,7 @@ export default {
     ...mapActions('auth', {
       login: LOGIN_ACTION,
       sendSignInLink: SEND_SIGNIN_LINK,
+      verifySignInLink: VERIFY_SIGNIN_LINK,
     }),
 
     // Email/Password Login
@@ -195,7 +190,7 @@ export default {
     // Handle Sign-In Link Click
     async onPasswordlessLoginLink() {
       try {
-        await this.$store.dispatch('auth/' + VERIFY_SIGNIN_LINK, { email: this.passwordlessEmail });
+        await this.verifySignInLink({ email: this.passwordlessEmail });
         this.$router.push('/dashboard');
       } catch (e) {
         this.error = e;

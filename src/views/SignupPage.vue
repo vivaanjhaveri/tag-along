@@ -59,48 +59,11 @@
             </div>
 
             <div class="my-3">
-              <button type="submit" class="btn btn-success w-100">
+              <button type="submit" class="btn btn-primary w-100">
                 Signup with Email
               </button>
             </div>
           </form>
-
-          <hr />
-
-          <!-- Passwordless Email Link Sign-Up Section -->
-          <h5>Passwordless Email Link Sign-Up</h5>
-          <!-- Error Alert -->
-          <div class="alert alert-danger" v-if="passwordlessError">
-            {{ passwordlessError }}
-          </div>
-          <!-- Success Alert -->
-          <div class="alert alert-success" v-if="passwordlessSuccess">
-            {{ passwordlessSuccess }}
-          </div>
-          <form @submit.prevent="onPasswordlessSignup">
-            <div class="form-group mb-3">
-              <label for="passwordlessEmail">Email</label>
-              <input
-                type="email"
-                class="form-control"
-                id="passwordlessEmail"
-                v-model.trim="passwordlessEmail"
-                @blur="validatePasswordlessEmail"
-                :class="{ 'is-invalid': passwordlessErrors.passwordlessEmail }"
-                placeholder="Enter your email"
-              />
-              <div class="invalid-feedback" v-if="passwordlessErrors.passwordlessEmail">
-                {{ passwordlessErrors.passwordlessEmail }}
-              </div>
-            </div>
-
-            <div class="my-3">
-              <button type="submit" class="btn btn-secondary w-100">
-                Send Sign-In Link
-              </button>
-            </div>
-          </form>
-
         </div>
       </div>
     </div>
@@ -109,7 +72,7 @@
 
 <script>
 import { mapActions } from 'vuex';
-import { SEND_SIGNIN_LINK, SIGNUP_ACTION } from '@/store/storeconstants';
+import { SIGNUP_ACTION } from '@/store/storeconstants';
 
 export default {
   name: 'SignupPage',
@@ -122,19 +85,12 @@ export default {
       emailPasswordError: '',
       emailPasswordSuccess: '',
 
-      // Passwordless Email Link Sign-Up Data
-      passwordlessEmail: '',
-      passwordlessErrors: {},
-      passwordlessError: '',
-      passwordlessSuccess: '',
-
       // Password Visibility Toggle
       showPassword: false,
     };
   },
   methods: {
     ...mapActions('auth', {
-      sendSignInLink: SEND_SIGNIN_LINK,
       signup: SIGNUP_ACTION,
     }),
 
@@ -142,8 +98,6 @@ export default {
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
-
-    // Email/Password Sign-Up Methods
 
     // Validate Email
     validateEmail() {
@@ -192,39 +146,6 @@ export default {
         }, 2000);
       } catch (e) {
         this.emailPasswordError = "Signup failed. Please try again.";
-      }
-    },
-
-    // Passwordless Email Link Sign-Up Methods
-
-    // Validate Passwordless Email
-    validatePasswordlessEmail() {
-      if (!this.passwordlessEmail) {
-        this.passwordlessErrors.passwordlessEmail = 'Email is required.';
-      } else if (!this.validEmail(this.passwordlessEmail)) {
-        this.passwordlessErrors.passwordlessEmail = 'Please enter a valid email address.';
-      } else {
-        this.passwordlessErrors.passwordlessEmail = '';
-      }
-    },
-
-    // Handle Passwordless Email Link Sign-Up
-    async onPasswordlessSignup() {
-      // Reset previous errors and messages
-      this.passwordlessError = '';
-      this.passwordlessSuccess = '';
-      this.validatePasswordlessEmail();
-
-      // Check for validation errors
-      if (Object.values(this.passwordlessErrors).some(error => error)) {
-        return;
-      }
-
-      try {
-        await this.sendSignInLink({ email: this.passwordlessEmail });
-        this.passwordlessSuccess = "Sign-in link sent! Please check your email.";
-      } catch (e) {
-        this.passwordlessError = e;
       }
     },
 

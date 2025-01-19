@@ -1,3 +1,5 @@
+// src/store/storeconstants.js
+
 // Actions
 export const SIGNUP_ACTION = 'SIGNUP_ACTION';
 export const LOGIN_ACTION = 'LOGIN_ACTION';
