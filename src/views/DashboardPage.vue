@@ -4,11 +4,7 @@
 
     <!-- NFC Scan Section -->
     <div class="mt-4">
-      <button
-        class="btn btn-primary mb-3"
-        @click="startScan"
-        :disabled="isScanning"
-      >
+      <button class="btn btn-primary mb-3" @click="startScan" :disabled="isScanning">
         {{ isScanning ? "Scanning..." : "Start Scan" }}
       </button>
       <div v-if="scanError" class="text-danger mt-4">
@@ -37,28 +33,16 @@
             <td>{{ tag.Tag_ID }}</td>
             <td>{{ tag.Object }}</td>
             <td>
-              <!-- Status: "Registered" => green, "Scanned" => yellow -->
-              <span
-                class="badge text-white"
-                :class="tag.Status === 'Registered' ? 'bg-success' : 'bg-warning'"
-              >
+              <span class="badge text-white" :class="tag.Status === 'Registered' ? 'bg-success' : 'bg-warning'">
                 {{ tag.Status }}
               </span>
             </td>
             <td>{{ tag.Last_Updated }}</td>
             <td>
-              <button
-                class="btn btn-warning btn-sm me-2"
-                @click="openRenameTagModal(tag)"
-                :disabled="isActionLocked"
-              >
+              <button class="btn btn-warning btn-sm me-2" @click="openRenameTagModal(tag)" :disabled="isActionLocked">
                 Rename
               </button>
-              <button
-                class="btn btn-danger btn-sm"
-                @click="deleteTag(tag.id)"
-                :disabled="isActionLocked"
-              >
+              <button class="btn btn-danger btn-sm" @click="deleteTag(tag.id)" :disabled="isActionLocked">
                 Delete
               </button>
             </td>
@@ -67,30 +51,19 @@
       </table>
     </div>
 
-    <!-- Rename Tag Modal (unchanged) -->
+    <!-- Rename Tag Modal -->
     <div v-if="showRenameTagModal" class="modal show d-block" tabindex="-1">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Rename Object</h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="closeRenameTagModal"
-              aria-label="Close"
-            ></button>
+            <button type="button" class="btn-close" @click="closeRenameTagModal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form @submit.prevent="renameTag">
               <div class="mb-3">
                 <label for="renameObject" class="form-label">Object</label>
-                <input
-                  type="text"
-                  id="renameObject"
-                  v-model="editableTag.Object"
-                  class="form-control"
-                  required
-                />
+                <input type="text" id="renameObject" v-model="editableTag.Object" class="form-control" required />
               </div>
               <button type="submit" class="btn btn-primary">Rename</button>
             </form>
@@ -131,38 +104,25 @@ export default {
   name: "DashboardPage",
   data() {
     return {
-      // NFC Scanner Data
       isScanning: false,
       scanError: "",
-
-      // Existing Dashboard Data
       tags: [],
       showRenameTagModal: false,
       isActionLocked: false,
       userId: "user123", // sample user ID
       maxTagsPerUser: 5,
-
-      // Temporary store for newly scanned tag
       newTag: {
         Tag_ID: "",
         Object: "",
         Status: "",
         Description: "",
       },
-
-      // Fields for rename
       editableTag: null,
-
-      // Timer references
       tagScanTimers: {},
     };
   },
   methods: {
-    // -------------------------------------
-    // NFC Scanner Logic
-    // -------------------------------------
     async startScan() {
-      // Check if NDEFReader is available
       if (!("NDEFReader" in window)) {
         this.scanError = "Web NFC is not supported on this device.";
         return;
@@ -177,84 +137,70 @@ export default {
         await ndef.scan();
         console.log("> Scan started");
 
-        // Handle reading error
         ndef.addEventListener("readingerror", () => {
           console.log("Cannot read data from the NFC tag. Try another one?");
           this.scanError = "Cannot read data from the NFC tag. Try another one?";
           this.isScanning = false;
         });
 
-        // Handle successful reading
         ndef.addEventListener("reading", ({ message, serialNumber }) => {
           console.log(`> Serial Number: ${serialNumber}`);
           console.log(`> Records: (${message.records.length})`);
 
           this.isScanning = false;
 
-          // Check if this Tag ID already exists in our local tags array
           const existingTagIndex = this.tags.findIndex(
             (tag) => tag.Tag_ID === serialNumber
           );
 
           if (existingTagIndex === -1) {
-            // Tag does NOT exist => create a new one with Status "Registered"
             this.newTag.Tag_ID = serialNumber || "Unknown";
-            this.newTag.Object = "Scanned NFC Tag"; // or decode record text
+            this.newTag.Object = "Scanned NFC Tag";
             this.newTag.Status = "Registered";
-            this.newTag.Description = ""; // optional
+            this.newTag.Description = "";
 
             alert("NFC Tag added successfully!");
             this.addNewTag();
-
-            // Start a 1-minute timer for this newly scanned "Registered" tag
-            this.startTagTimer(serialNumber);
           } else {
-            // If the tag already exists, update its doc to Status "Scanned"
             const existingTagId = this.tags[existingTagIndex].id;
             this.updateTagStatus(existingTagId, "Scanned");
+            this.startTagTimer(serialNumber);
           }
         });
       } catch (error) {
         console.log("NFC scan error:", error);
-        this.scanError =
-          "NFC scan failed. Ensure your device supports NFC and try again.";
+        this.scanError = "NFC scan failed. Ensure your device supports NFC and try again.";
         this.isScanning = false;
       }
     },
 
-    // -------------------------------------
-    // Start a 1-minute timer for the newly scanned tag
-    // -------------------------------------
     startTagTimer(tagId) {
-      // Clear any previous timer for this tag, if it exists
       if (this.tagScanTimers[tagId]) {
         clearTimeout(this.tagScanTimers[tagId]);
       }
 
-      // 5s = 5000 ms (adjust as needed)
       const timerId = setTimeout(() => {
-        // Find that tag in our local array
-        const foundTag = this.tags.find((t) => t.Tag_ID === tagId);
+        const registeredTags = this.tags.filter((t) => t.Status === "Registered");
 
-        // If the tag still exists & is STILL "Registered", raise an alert
-        if (foundTag && foundTag.Status === "Registered") {
-          alert(`You left your ${foundTag.Object} behind`);
+        if (registeredTags.length > 0) {
+          registeredTags.forEach((tag) => {
+            const objectName = tag.Object;
+            alert(`You left your ${objectName} behind`);
+          });
         }
 
-        // Remove timer from tracking
         delete this.tagScanTimers[tagId];
       }, 5000);
 
-      // Store the timer reference
       this.tagScanTimers[tagId] = timerId;
     },
 
-    // -------------------------------------
-    // Firestore: Add Tag (for new Tag IDs)
-    // -------------------------------------
     async addNewTag() {
       if (this.isActionLocked || this.tags.length >= this.maxTagsPerUser) {
-        alert("Max tags reached or action locked!");
+        if (!this.scanError) {
+          alert("Max tags reached!");
+          this.scanError = "Max tags reached!";
+        }
         return;
       }
 
@@ -272,13 +218,7 @@ export default {
 
         console.log("Tag added to Firebase:", newTagWithTimestamp);
 
-        // Reset the newTag object
-        this.newTag = {
-          Tag_ID: "",
-          Object: "",
-          Status: "",
-          Description: "",
-        };
+        this.newTag = { Tag_ID: "", Object: "", Status: "", Description: "" };
       } catch (error) {
         console.error("Error adding tag to Firebase:", error);
         alert("Failed to save the tag to Firebase.");
@@ -287,9 +227,6 @@ export default {
       }
     },
 
-    // -------------------------------------
-    // Firestore: Update Existing Tag to "Scanned"
-    // -------------------------------------
     async updateTagStatus(tagId, newStatus) {
       if (this.isActionLocked) return;
       this.isActionLocked = true;
@@ -303,7 +240,6 @@ export default {
           Last_Updated: timestamp,
         });
 
-        // Update local array
         const index = this.tags.findIndex((t) => t.id === tagId);
         if (index !== -1) {
           this.tags[index].Status = newStatus;
@@ -319,9 +255,6 @@ export default {
       }
     },
 
-    // -------------------------------------
-    // CRUD: Delete Tag
-    // -------------------------------------
     async deleteTag(tagId) {
       if (this.isActionLocked) return;
       this.isActionLocked = true;
