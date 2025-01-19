@@ -71,7 +71,7 @@ export default {
     try {
       response = await Axios.post(payload.url, postData);
     } catch (err) {
-      let errorMessage = 'Unexpected error occurred. Please try again.';
+      let errorMessage = 'Invalid login details.';
       if (
         err.response &&
         err.response.data &&
