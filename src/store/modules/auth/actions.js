@@ -1,5 +1,6 @@
 import Axios from 'axios';
-import SignupValidations from '../../../services/SignupValidations';
+import SignupValidations from '@/services/SignupValidations';
+
 import {
     AUTH_ACTION,
     LOGIN_ACTION,
@@ -9,7 +10,7 @@ import {
     SIGNUP_ACTION,
     AUTO_LOGOUT_ACTION,
     SET_AUTO_LOGOUT_MUTATION,
-} from '../../storeconstants';
+} from '@/store/storeconstants';
 
 let timer = '';
 export default {
@@ -75,9 +76,6 @@ export default {
         try {
             response = await Axios.post(payload.url, postData);
         } catch (err) {
-            // context.commit(LOADING_SPINNER_SHOW_MUTATION, false, {
-            //     root: true,
-            // });
             let errorMessage = SignupValidations.getErrorMessageFromCode(
                 err.response.data.error.errors[0].message,
             );

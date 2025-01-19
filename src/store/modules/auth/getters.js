@@ -1,7 +1,7 @@
 import {
     GET_USER_TOKEN_GETTER,
     IS_USER_AUTHENTICATE_GETTER,
-} from '../../storeconstants';
+} from '@/store/storeconstants';
 
 export default {
     [GET_USER_TOKEN_GETTER]: (state) => {
