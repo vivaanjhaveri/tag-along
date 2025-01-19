@@ -4,7 +4,7 @@
     <div class="col-md-6 offset-md-3">
       <div class="card mt-5">
         <div class="card-body">
-          <h3>Login</h3>
+          <h3 style="color: #0d6efd;">Login</h3>
           <hr />
           <!-- Error Alert -->
           <div class="alert alert-danger" v-if="error">
