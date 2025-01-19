@@ -85,7 +85,7 @@ export default {
                 this.error = e;
             }
 
-            this.$router.push('/posts');
+            this.$router.push('/home');
         },
     },
 
