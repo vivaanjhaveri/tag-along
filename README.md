@@ -25,31 +25,31 @@ TagAlong is built with **Vue.js** and **Firebase** to deliver a responsive, secu
 
 ## Key Features
 
-1. **RFID Tag Management**  
+1. **RFID Tag Management** 🏷️  
    - Add, rename, and delete tags with minimal effort.  
    - Quickly generate unique RFID tokens and calibrate tags.
 
-2. **User Authentication**  
-   - Secure login and signup with **Email/Password** or **Passwordless** (Email Link) login.  
+2. **User Authentication** 🔐  
+   - Secure login and signup with **Email/Password** login.  
    - Managed with **Firebase Authentication** for reliability and security.
 
-3. **Dark Mode**  
+3. **Dark Mode** 🌑  
    - Toggle dark mode sitewide for comfortable reading in low-light environments.  
    - Automatically persists user preference across sessions.
 
-4. **Comprehensive Dashboard**  
+4. **Comprehensive Dashboard** 🖥️  
    - Displays a table of all tags, including status and timestamps.  
    - Edit or remove tags directly from the dashboard.
 
-5. **Guide Page**  
+5. **Guide Page** 📖  
    - A dedicated page providing step-by-step usage instructions.  
    - Ensures a smooth onboarding experience.
 
-6. **Responsive Design**  
+6. **Responsive Design** 📱💻  
    - Built with **Bootstrap** for mobile-friendly layouts.  
    - Adapts seamlessly to different screen sizes.
 
-7. **Firebase Hosting Deployment**  
+7. **Firebase Hosting Deployment** 🚀  
    - Easily deploy to Firebase Hosting via the provided configuration.
 
 ---
