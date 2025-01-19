@@ -71,7 +71,7 @@
               @change="toggleDarkMode"
             />
             <label class="form-check-label" for="darkModeToggle">
-              {{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}
+              {{ !isDarkMode ? 'Light Mode' : 'Dark Mode' }}
             </label>
           </div>
         </div>
