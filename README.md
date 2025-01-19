@@ -1,6 +1,6 @@
 # TagAlong
 
-**TagAlong** is a powerful RFID tag management system that simplifies the process of tracking and organizing your RFID-tagged items. Designed with a user-friendly interface, dark mode support, and straightforward navigation, TagAlong ensures a seamless experience from setup to daily usage.
+**TagAlong**, an NFC system for Android, helps neurodivergent individuals and anyone prone to forgetfulness track essentials. Scan items or use future doorframe scanners for stress-free organization.
 
 ---
 
@@ -17,9 +17,8 @@
 
 ## Overview
 
-TagAlong is built with **Vue.js** and **Firebase** to deliver a responsive, secure, and easily deployable web application. Whether you're scanning items in a warehouse or organizing personal belongings, TagAlong provides quick tag calibration, object description, and status management at your fingertips.
-
-**Live Site:** [https://tag-along.web.app/](https://tag-along.web.app/)
+TagAlong is built with **Vue.js** and **Firebase**  designed to assist neurodivergent individuals, such as those with ADHD and autism, in keeping track of essential items like keys and wallets. By using an Android phone to scan tagged items before leaving, users receive alerts if any item is missing, reducing stress and enhancing daily routines.
+**Live Site:** [https://tag-along.web.app/](https://tag-along.co/)
 
 ---
 
@@ -27,30 +26,29 @@ TagAlong is built with **Vue.js** and **Firebase** to deliver a responsive, secu
 
 1. **RFID Tag Management** 🏷️  
    - Add, rename, delete, and reset tags with minimal effort.  
-   - Quickly generate unique RFID tokens and calibrate tags.
+   - Get notified when you leave a tag behind.
 
 2. **User Authentication** 🔐  
    - Secure login and signup with **Email/Password** login.  
    - Managed with **Firebase Authentication** for reliability and security.
 
 3. **Dark Mode** 🌑  
-   - Toggle dark mode sitewide for comfortable reading in low-light environments.  
+   - Toggle dark mode sitewide for accessible viewing in low-light environments.  
    - Automatically persists user preference across sessions.  
    - Dynamic logo switching between light (blue) and dark (yellow) modes.
 
 4. **Comprehensive Dashboard** 🖥️  
-   - Displays a table of all tags, including status and timestamps.  
+   - Displays a table of all tags and their status.  
    - Edit, delete, or reset the status of all tags directly from the dashboard.  
    - Responsive design ensures seamless interaction on mobile devices with horizontal scrolling for tables.
 
 5. **Guide Page** 📖  
-   - A dedicated page providing step-by-step usage instructions, enhanced with emojis for better visual engagement.  
+   - A dedicated page providing step-by-step user instructions, enhanced with emojis for better visual engagement.  
    - Ensures a smooth onboarding experience.
 
 6. **Responsive Design** 📱💻  
-   - Built with **Bootstrap** for mobile-friendly layouts.  
+   - Built with **Bootstrap** for improved aesthetics via CSS.  
    - Adapts seamlessly to different screen sizes.  
-   - Home page features centered logo and buttons for clean navigation.
 
 7. **Smooth Animations** ✨  
    - Hover effects and transitions enhance user experience.  
@@ -103,53 +101,23 @@ TagAlong is built with **Vue.js** and **Firebase** to deliver a responsive, secu
    firebase deploy
    ```
    Replace `public` with your build folder (e.g., `dist`) in `firebase.json` if prompted.
-
----
-
-## Usage
-
-1. **Sign Up or Log In**  
-   - Create an account using Email/Password or **Passwordless** login.  
-   - Access your RFID tags on the dashboard upon successful authentication.
-
-2. **Add Tags**  
-   - Click **Add New Tag** on the dashboard.  
-   - Calibrate tags (generate an RFID token) before finalizing.
-
-3. **Manage Tags**  
-   - **Rename**: Update an existing tag’s object name.  
-   - **Delete**: Remove tags no longer in use.  
-   - **Reset**: Reset the status of all tags to "Registered" in one click.  
-   - **Status Updates**: Each new tag defaults to `Not Scanned`; scanning changes it to `Scanned`.
-
-4. **Dark Mode**  
-   - Toggle the dark mode switch in the navbar for improved visibility in low-light conditions.  
-   - Preferences are automatically saved and restored.  
-   - The logo dynamically changes based on the mode.
-
-5. **Guide Page**  
-   - Read the **Guide** for detailed step-by-step instructions.  
-   - Enhanced with emojis for better visual engagement.
-
 ---
 
 ## Firebase Integration
 
 - **Authentication**  
-  Handled by **Firebase Authentication** for secure user sign-ups and logins.
+  Handled by **Firebase Authentication API** for secure user sign-ups and logins.
 
 - **Database**  
-  Uses **Firestore** to store tags and user data, enabling create/read/update/delete operations.
+  Uses **Firestore Database** to store tags and user data, enabling create/read/update/delete operations via the dashboard.
 
 - **Hosting**  
   Deploy easily with `firebase deploy`. The `firebase.json` file rewrites unknown routes to `index.html` for smooth SPA navigation.
 
 ---
 
-## Contact
+## Devpost
 
-For questions, feedback, or suggestions, feel free to reach out via:
-
-- **Email**: vivaan.jhaveri@gmail.com
+Check out our [Devpost](https://devpost.com/software/tagalong-t2lx75).
 
 Thank you for using **TagAlong** – happy tagging!
