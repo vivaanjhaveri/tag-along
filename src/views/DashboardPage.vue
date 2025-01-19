@@ -3,13 +3,17 @@
     <h2 class="text-center">Dashboard</h2>
 
     <!-- NFC Scan Section -->
-    <div class="mt-4">
+    <div class="mt-4" style="text-align: center;">
       <button class="btn btn-primary mb-3" @click="startScan" :disabled="isScanning">
         {{ isScanning ? "Scanning..." : "Start Scan" }}
       </button>
       <div v-if="scanError" class="text-danger mt-4">
         <p>{{ scanError }}</p>
       </div>
+
+      <button class="btn btn-danger mb-3" @click="resetAllTagsStatus">
+        Reset Tags
+      </button>
     </div>
     <hr />
 
@@ -76,6 +80,7 @@
 
 <script>
 /* global NDEFReader */
+import { writeBatch } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
@@ -122,6 +127,40 @@ export default {
     };
   },
   methods: {
+    async resetAllTagsStatus() {
+    if (this.isActionLocked) return;
+
+    this.isActionLocked = true;
+    try {
+      // Update each tag status to "Registered" in Firestore
+      const timestamp = new Date().toLocaleString();
+      const batch = writeBatch(db);  // Batch write to reduce multiple requests
+
+      this.tags.forEach((tag) => {
+        const tagRef = doc(db, "tags", tag.id);
+        batch.update(tagRef, {
+          Status: "Registered",
+          Last_Updated: timestamp,
+        });
+      });
+
+      // Commit the batch update
+      await batch.commit();
+      // Update local tags list
+      this.tags.forEach((tag) => {
+        tag.Status = "Registered";
+        tag.Last_Updated = timestamp;
+      });
+
+      console.log("All tags have been reset to 'Registered'.");
+    } catch (error) {
+      console.error("Error resetting tags:", error);
+      alert("Failed to reset the tags.");
+    } finally {
+      this.isActionLocked = false;
+    }
+  },
+
     async startScan() {
       if (!("NDEFReader" in window)) {
         this.scanError = "Web NFC is not supported on this device.";
@@ -149,17 +188,18 @@ export default {
 
           this.isScanning = false;
 
+          // Check if the tag already exists in the list
           const existingTagIndex = this.tags.findIndex(
             (tag) => tag.Tag_ID === serialNumber
           );
 
+          // Only show the alert and add new tag if it does not exist
           if (existingTagIndex === -1) {
             this.newTag.Tag_ID = serialNumber || "Unknown";
             this.newTag.Object = "Scanned NFC Tag";
             this.newTag.Status = "Registered";
             this.newTag.Description = "";
 
-            alert("NFC Tag added successfully!");
             this.addNewTag();
           } else {
             const existingTagId = this.tags[existingTagIndex].id;
@@ -196,7 +236,10 @@ export default {
     },
 
     async addNewTag() {
-      if (this.isActionLocked || this.tags.length >= this.maxTagsPerUser) {
+      if (this.isActionLocked) return;
+
+      // Check for max tags condition before proceeding
+      if (this.tags.length >= this.maxTagsPerUser) {
         if (!this.scanError) {
           alert("Max tags reached!");
           this.scanError = "Max tags reached!";
