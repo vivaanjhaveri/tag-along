@@ -1,6 +1,6 @@
 <!-- src/components/Navbar.vue -->
 <template>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
         <!-- Brand -->
         <router-link class="navbar-brand" to="/">TagAlong</router-link>
@@ -113,5 +113,5 @@
     color: #0d6efd; /* Bootstrap primary color */
   }
   
-  /* Optional: Customize navbar styles further if needed */
-  </style>  
+  </style>
+  
