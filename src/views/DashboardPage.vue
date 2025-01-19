@@ -142,7 +142,7 @@ export default {
       userId: "user123", // sample user ID
       maxTagsPerUser: 5,
 
-      // We'll still use newTag to store the scanned info temporarily
+      // Temporary store for newly scanned tag
       newTag: {
         Tag_ID: "",
         Object: "",
@@ -152,6 +152,9 @@ export default {
 
       // Fields for rename
       editableTag: null,
+
+      // Timer references
+      tagScanTimers: {},
     };
   },
   methods: {
@@ -176,7 +179,7 @@ export default {
 
         // Handle reading error
         ndef.addEventListener("readingerror", () => {
-          console.log("Argh! Cannot read data from the NFC tag. Try another one?");
+          console.log("Cannot read data from the NFC tag. Try another one?");
           this.scanError = "Cannot read data from the NFC tag. Try another one?";
           this.isScanning = false;
         });
@@ -186,10 +189,9 @@ export default {
           console.log(`> Serial Number: ${serialNumber}`);
           console.log(`> Records: (${message.records.length})`);
 
-          alert("NFC Tag was read successfully!");
           this.isScanning = false;
 
-          // Check if this Tag ID already exists in Firestore
+          // Check if this Tag ID already exists in our local tags array
           const existingTagIndex = this.tags.findIndex(
             (tag) => tag.Tag_ID === serialNumber
           );
@@ -197,23 +199,54 @@ export default {
           if (existingTagIndex === -1) {
             // Tag does NOT exist => create a new one with Status "Registered"
             this.newTag.Tag_ID = serialNumber || "Unknown";
-            this.newTag.Object = "Scanned NFC Tag"; // or derive from record text
+            this.newTag.Object = "Scanned NFC Tag"; // or decode record text
             this.newTag.Status = "Registered";
             this.newTag.Description = ""; // optional
 
+            alert("NFC Tag added successfully!");
             this.addNewTag();
+
+            // Start a 1-minute timer for this newly scanned "Registered" tag
+            this.startTagTimer(serialNumber);
           } else {
-            // Tag already exists => update the existing doc to Status "Scanned"
+            // If the tag already exists, update its doc to Status "Scanned"
             const existingTagId = this.tags[existingTagIndex].id;
             this.updateTagStatus(existingTagId, "Scanned");
           }
         });
       } catch (error) {
-        console.log("Argh! " + error);
+        console.log("NFC scan error:", error);
         this.scanError =
           "NFC scan failed. Ensure your device supports NFC and try again.";
         this.isScanning = false;
       }
+    },
+
+    // -------------------------------------
+    // Start a 1-minute timer for the newly scanned tag
+    // -------------------------------------
+    startTagTimer(tagId) {
+      // Clear any previous timer for this tag, if it exists
+      if (this.tagScanTimers[tagId]) {
+        clearTimeout(this.tagScanTimers[tagId]);
+      }
+
+      // 5s = 5000 ms (adjust as needed)
+      const timerId = setTimeout(() => {
+        // Find that tag in our local array
+        const foundTag = this.tags.find((t) => t.Tag_ID === tagId);
+
+        // If the tag still exists & is STILL "Registered", raise an alert
+        if (foundTag && foundTag.Status === "Registered") {
+          alert(`You left your ${foundTag.Object} behind`);
+        }
+
+        // Remove timer from tracking
+        delete this.tagScanTimers[tagId];
+      }, 5000);
+
+      // Store the timer reference
+      this.tagScanTimers[tagId] = timerId;
     },
 
     // -------------------------------------
@@ -239,7 +272,7 @@ export default {
 
         console.log("Tag added to Firebase:", newTagWithTimestamp);
 
-        // Reset the newTag
+        // Reset the newTag object
         this.newTag = {
           Tag_ID: "",
           Object: "",
@@ -277,7 +310,7 @@ export default {
           this.tags[index].Last_Updated = timestamp;
         }
 
-        console.log("Tag updated to 'Scanned':", tagId);
+        console.log(`Tag updated to '${newStatus}':`, tagId);
       } catch (error) {
         console.error("Error updating tag:", error);
         alert("Failed to update the tag status.");
@@ -305,7 +338,7 @@ export default {
     },
 
     // -------------------------------------
-    // CRUD: Rename Tag
+    // Rename Tag
     // -------------------------------------
     openRenameTagModal(tag) {
       this.editableTag = { ...tag };
@@ -365,7 +398,7 @@ export default {
   margin: auto;
 }
 
-/* Optional if you want to ensure white text for both statuses */
+/* Ensures white text for the badge */
 .badge.text-white {
   color: #fff;
 }
