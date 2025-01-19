@@ -26,7 +26,7 @@
                 Home
               </router-link>
             </li>
-  
+
             <!-- Links for Unauthenticated Users -->
             <template v-if="!isAuthenticated">
               <li class="nav-item">

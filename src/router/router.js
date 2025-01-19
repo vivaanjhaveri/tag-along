@@ -7,7 +7,6 @@ import GuidePage from '@/views/GuidePage.vue';
 import store from '@/store/store';
 import { IS_USER_AUTHENTICATE_GETTER } from '@/store/storeconstants';
 
-
 const routes = [
     { path: '/', component: HomeView },
     { path: '/guide', component: GuidePage, meta: { auth: false } },
