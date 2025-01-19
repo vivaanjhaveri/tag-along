@@ -26,7 +26,7 @@ TagAlong is built with **Vue.js** and **Firebase** to deliver a responsive, secu
 ## Key Features
 
 1. **RFID Tag Management** 🏷️  
-   - Add, rename, and delete tags with minimal effort.  
+   - Add, rename, delete, and reset tags with minimal effort.  
    - Quickly generate unique RFID tokens and calibrate tags.
 
 2. **User Authentication** 🔐  
@@ -35,21 +35,28 @@ TagAlong is built with **Vue.js** and **Firebase** to deliver a responsive, secu
 
 3. **Dark Mode** 🌑  
    - Toggle dark mode sitewide for comfortable reading in low-light environments.  
-   - Automatically persists user preference across sessions.
+   - Automatically persists user preference across sessions.  
+   - Dynamic logo switching between light (blue) and dark (yellow) modes.
 
 4. **Comprehensive Dashboard** 🖥️  
    - Displays a table of all tags, including status and timestamps.  
-   - Edit or remove tags directly from the dashboard.
+   - Edit, delete, or reset the status of all tags directly from the dashboard.  
+   - Responsive design ensures seamless interaction on mobile devices with horizontal scrolling for tables.
 
 5. **Guide Page** 📖  
-   - A dedicated page providing step-by-step usage instructions.  
+   - A dedicated page providing step-by-step usage instructions, enhanced with emojis for better visual engagement.  
    - Ensures a smooth onboarding experience.
 
 6. **Responsive Design** 📱💻  
    - Built with **Bootstrap** for mobile-friendly layouts.  
-   - Adapts seamlessly to different screen sizes.
+   - Adapts seamlessly to different screen sizes.  
+   - Home page features centered logo and buttons for clean navigation.
 
-7. **Firebase Hosting Deployment** 🚀  
+7. **Smooth Animations** ✨  
+   - Hover effects and transitions enhance user experience.  
+   - Modern card interactions across the site.
+
+8. **Firebase Hosting Deployment** 🚀  
    - Easily deploy to Firebase Hosting via the provided configuration.
 
 ---
@@ -57,8 +64,8 @@ TagAlong is built with **Vue.js** and **Firebase** to deliver a responsive, secu
 ## Installation
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v16 or higher)
-- [Vue CLI](https://cli.vuejs.org/)
+- [Node.js](https://nodejs.org/) (v16 or higher)  
+- [Vue CLI](https://cli.vuejs.org/)  
 - [Firebase CLI](https://firebase.google.com/docs/cli) (for deployment)
 
 ### Steps
@@ -75,8 +82,8 @@ TagAlong is built with **Vue.js** and **Firebase** to deliver a responsive, secu
    ```
 
 3. **Configure Firebase**  
-   - Create a new project in [Firebase Console](https://console.firebase.google.com/).
-   - Enable **Email/Password** and **Email Link** sign-in methods under **Authentication**.
+   - Create a new project in [Firebase Console](https://console.firebase.google.com/).  
+   - Enable **Email/Password** and **Email Link** sign-in methods under **Authentication**.  
    - Update the `src/services/firebase.js` file with your Firebase credentials.
 
 4. **Build the App**  
@@ -112,15 +119,17 @@ TagAlong is built with **Vue.js** and **Firebase** to deliver a responsive, secu
 3. **Manage Tags**  
    - **Rename**: Update an existing tag’s object name.  
    - **Delete**: Remove tags no longer in use.  
+   - **Reset**: Reset the status of all tags to "Registered" in one click.  
    - **Status Updates**: Each new tag defaults to `Not Scanned`; scanning changes it to `Scanned`.
 
 4. **Dark Mode**  
    - Toggle the dark mode switch in the navbar for improved visibility in low-light conditions.  
-   - Preferences are automatically saved and restored.
+   - Preferences are automatically saved and restored.  
+   - The logo dynamically changes based on the mode.
 
 5. **Guide Page**  
    - Read the **Guide** for detailed step-by-step instructions.  
-   - Perfect for first-time users.
+   - Enhanced with emojis for better visual engagement.
 
 ---
 
@@ -141,6 +150,6 @@ TagAlong is built with **Vue.js** and **Firebase** to deliver a responsive, secu
 
 For questions, feedback, or suggestions, feel free to reach out via:
 
-- **Gmail**: vivaan.jhaveri@gmail.com
+- **Email**: vivaan.jhaveri@gmail.com
 
 Thank you for using **TagAlong** – happy tagging!

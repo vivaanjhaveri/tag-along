@@ -21,38 +21,40 @@
     <div class="mt-4">
       <h4>RFID Tags Information</h4>
 
-      <!-- Tags Table -->
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th scope="col">Tag ID</th>
-            <th scope="col">Object</th>
-            <th scope="col">Status</th>
-            <th scope="col">Last Updated</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="tag in tags" :key="tag.id">
-            <td>{{ tag.Tag_ID }}</td>
-            <td>{{ tag.Object }}</td>
-            <td>
-              <span class="badge text-white" :class="tag.Status === 'Registered' ? 'bg-success' : 'bg-warning'">
-                {{ tag.Status }}
-              </span>
-            </td>
-            <td>{{ tag.Last_Updated }}</td>
-            <td>
-              <button class="btn btn-warning btn-sm me-2" @click="openRenameTagModal(tag)" :disabled="isActionLocked">
-                Rename
-              </button>
-              <button class="btn btn-danger btn-sm" @click="deleteTag(tag.id)" :disabled="isActionLocked">
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Responsive Table Wrapper -->
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Tag ID</th>
+              <th scope="col">Object</th>
+              <th scope="col">Status</th>
+              <th scope="col">Last Updated</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="tag in tags" :key="tag.id">
+              <td>{{ tag.Tag_ID }}</td>
+              <td>{{ tag.Object }}</td>
+              <td>
+                <span class="badge text-white" :class="tag.Status === 'Registered' ? 'bg-success' : 'bg-warning'">
+                  {{ tag.Status }}
+                </span>
+              </td>
+              <td>{{ tag.Last_Updated }}</td>
+              <td>
+                <button class="btn btn-warning btn-sm me-2" @click="openRenameTagModal(tag)" :disabled="isActionLocked">
+                  Rename
+                </button>
+                <button class="btn btn-danger btn-sm" @click="deleteTag(tag.id)" :disabled="isActionLocked">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Rename Tag Modal -->
@@ -363,6 +365,11 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Responsive table styles */
+.table-responsive {
+  overflow-x: auto; /* Horizontal scrolling for small screens */
 }
 
 .btn {
