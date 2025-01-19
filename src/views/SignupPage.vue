@@ -67,7 +67,7 @@
               </div>
   
               <div class="my-3">
-                <button type="submit" class="btn btn-success w-100">
+                <button type="submit" class="btn btn-primary w-100">
                   <span>Signup</span>
                 </button>
               </div>
