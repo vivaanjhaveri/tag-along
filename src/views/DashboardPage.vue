@@ -152,7 +152,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 
-// Firebase configuration using environment variables
 const firebaseConfig = {
   apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
   authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
@@ -163,7 +162,6 @@ const firebaseConfig = {
   measurementId: process.env.VUE_APP_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase and Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -174,7 +172,6 @@ export default {
       tags: [],
       showAddTagModal: false,
       showRenameTagModal: false,
-      scanComplete: false,
       isCalibrated: false,
       newTag: {
         Tag_ID: "",
@@ -184,7 +181,6 @@ export default {
       },
       editableTag: null,
       isActionLocked: false,
-      userId: "user123",
       maxTagsPerUser: 5,
     };
   },
@@ -192,7 +188,6 @@ export default {
     openAddTagModal() {
       this.showAddTagModal = true;
       this.isCalibrated = false;
-      this.scanComplete = false;
     },
     closeAddTagModal() {
       this.showAddTagModal = false;
@@ -211,28 +206,21 @@ export default {
       if (this.isActionLocked || this.tags.length >= this.maxTagsPerUser) return;
       this.isActionLocked = true;
       const timestamp = new Date().toLocaleString();
-      const newTagWithTimestamp = { ...this.newTag, Last_Updated: timestamp, userId: this.userId };
+      const newTagWithTimestamp = { ...this.newTag, Last_Updated: timestamp };
       try {
         const docRef = await addDoc(collection(db, "tags"), newTagWithTimestamp);
         this.tags.push({ id: docRef.id, ...newTagWithTimestamp });
-        console.log("Tag added to Firebase:", newTagWithTimestamp);
         this.resetNewTag();
       } catch (error) {
-        console.error("Error adding tag to Firebase:", error);
-        alert("Failed to save the tag to Firebase.");
+        console.error("Error adding tag:", error);
       } finally {
         this.isActionLocked = false;
       }
     },
     calibrateTag() {
-      const generatedToken = this.generateRFIDToken();
-      this.newTag.Tag_ID = generatedToken;
+      this.newTag.Tag_ID = `RFID-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
       this.newTag.Status = "Not Scanned";
-      this.scanComplete = true;
       this.isCalibrated = true;
-    },
-    generateRFIDToken() {
-      return `RFID-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
     },
     async deleteTag(tagId) {
       if (this.isActionLocked) return;
@@ -240,10 +228,8 @@ export default {
       try {
         await deleteDoc(doc(db, "tags", tagId));
         this.tags = this.tags.filter((tag) => tag.id !== tagId);
-        console.log("Tag deleted:", tagId);
       } catch (error) {
         console.error("Error deleting tag:", error);
-        alert("Failed to delete the tag.");
       } finally {
         this.isActionLocked = false;
       }
@@ -257,6 +243,7 @@ export default {
       this.editableTag = null;
     },
     async renameTag() {
+      if (!this.editableTag || !this.editableTag.id) return;
       try {
         const tagRef = doc(db, "tags", this.editableTag.id);
         await updateDoc(tagRef, { Object: this.editableTag.Object });
@@ -264,10 +251,8 @@ export default {
         if (index !== -1) {
           this.tags[index].Object = this.editableTag.Object;
         }
-        console.log("Tag renamed:", this.editableTag);
       } catch (error) {
         console.error("Error renaming tag:", error);
-        alert("Failed to rename the object.");
       } finally {
         this.closeRenameTagModal();
       }
@@ -278,7 +263,7 @@ export default {
       const querySnapshot = await getDocs(collection(db, "tags"));
       this.tags = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
-      console.error("Error fetching tags from Firebase:", error);
+      console.error("Error fetching tags:", error);
     }
   },
 };
