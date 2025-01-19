@@ -6,12 +6,12 @@ export default {
     namespaced: true,
     state() {
         return {
-            token: '',
-            email: '',
-            userId: '',
-            refreshToken: '',
-            expiresIn: 'sdsds',
-            autoLogout: false,
+          token: '',
+          email: '',
+          userId: '',
+          refreshToken: '',
+          expiresIn: null,
+          autoLogout: false,
         };
     },
     mutations,
